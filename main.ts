@@ -1,8 +1,8 @@
+namespace SpriteKind {
+    export const fishingNet = SpriteKind.create()
+}
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile6`, function (sprite, location) {
-    game.splash("Level 3")
-    level3 = true
-    tiles.setTilemap(tilemap`level4`)
-    tiles.placeOnRandomTile(fish, assets.tile`myTile5`)
+    game.over(true)
 })
 function level1 () {
     game.splash("Underwater Runway", "Level 1")
@@ -46,20 +46,30 @@ function level1 () {
         tiles.placeOnRandomTile(shark, assets.tile`myTile`)
     }
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile9`, function (sprite, location) {
+    game.splash("Level 3")
+    level3 = true
+    changeLevel = true
+    tiles.placeOnRandomTile(fish, assets.tile`myTile5`)
+})
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile3`, function (sprite, location) {
     game.splash("Level 2")
     level2 = true
-    tiles.setTilemap(tilemap`level4`)
-    tiles.placeOnRandomTile(fish, assets.tile`myTile5`)
+    changeLevel = true
+    tiles.placeOnRandomTile(sprite, assets.tile`myTile5`)
     tiles.destroySpritesOfKind(SpriteKind.Enemy)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.fishingNet, function (sprite, otherSprite) {
+    game.over(false)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     game.over(false)
 })
 let fishingNet: Sprite = null
-let level2 = false
 let shark: Sprite = null
+let changeLevel = false
 let level3 = false
+let level2 = false
 let fish: Sprite = null
 fish = sprites.create(img`
     . . . . . . . . . . . . . . . . 
@@ -82,6 +92,21 @@ fish = sprites.create(img`
 controller.moveSprite(fish, 130, 130)
 scene.cameraFollowSprite(fish)
 level1()
+level2 = false
+level3 = false
+changeLevel = false
+game.onUpdate(function () {
+    if (changeLevel == true) {
+        if (level2 == true) {
+            tiles.setTilemap(tilemap`level4`)
+            changeLevel = false
+        }
+        if (level3 == true) {
+            tiles.setTilemap(tilemap`level8`)
+            changeLevel = false
+        }
+    }
+})
 game.onUpdateInterval(500, function () {
     if (level2 || level3) {
         shark = sprites.create(img`
@@ -123,32 +148,31 @@ game.onUpdateInterval(500, function () {
         shark.setFlag(SpriteFlag.DestroyOnWall, true)
     }
 })
-game.onUpdateInterval(500, function () {
+game.onUpdateInterval(200, function () {
     if (level3) {
-        for (let index = 0; index < 3; index++) {
-            fishingNet = sprites.createProjectileFromSide(img`
-                ..........ee....
-                .........eeee...
-                ........eeeee...
-                .....eee.eeee...
-                ....ee..eee.ee..
-                ...ee..eeee.ee..
-                ...e...e.e.eee..
-                ...e..e..e.e.e..
-                ...e.ee.ee.e.e..
-                ..ee.e..e.ee.e..
-                ..e.ee.ee.e..e..
-                ..e.e..e..e..e..
-                ..eee.ee.e..ee..
-                ...e..e.ee..e...
-                ...eeee.e.ee....
-                ......eeee......
-                ................
-                ................
-                ................
-                ................
-                `, 0, 50)
-            fishingNet.setPosition(randint(0, scene.screenWidth()), 0)
-        }
+        fishingNet = sprites.createProjectileFromSide(img`
+            ..........ff....
+            .........ffff...
+            ........fffff...
+            .....fff.ffff...
+            ....ff..fff.ff..
+            ...ff..ffff.ff..
+            ...f...f.f.fff..
+            ...f..f..f.f.f..
+            ...f.ff.ff.f.f..
+            ..ff.f..f.ff.f..
+            ..f.ff.ff.f..f..
+            ..f.f..f..f..f..
+            ..fff.ff.f..ff..
+            ...f..f.ff..f...
+            ...ffff.f.ff....
+            ......ffff......
+            ................
+            ................
+            ................
+            ................
+            `, 0, 50)
+        fishingNet.setKind(SpriteKind.fishingNet)
+        fishingNet.setPosition(randint(40, 800), 0)
     }
 })
