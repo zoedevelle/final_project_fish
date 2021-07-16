@@ -5,7 +5,8 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile6`, function (sprite, l
     game.over(true)
 })
 function level1 () {
-    game.splash("Underwater Runway", "Level 1")
+    game.splash("Underwater Runway", "Don't die by avoiding deadly objects!")
+    game.splash("Level 1")
     tiles.setTilemap(tilemap`level1`)
     tiles.placeOnRandomTile(fish, assets.tile`myTile5`)
     for (let index = 0; index < 3; index++) {
